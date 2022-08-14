@@ -1,11 +1,15 @@
+import pandas as pd
 import requests
 import feedparser
 from bs4 import BeautifulSoup
 import database as db
 import desc_getter as dg
+import os
+from googletrans import Translator
 import time
+translator = Translator()
 
-
+# Hello World
 
 
 # getting database variables
@@ -32,11 +36,11 @@ def get_data(url):
 
 
 # __________________________________Create dataframe____________________
-def create_data(url,lang):
-
+def create_df(url,lang):
+    flag = 0
     data = get_data(url)
     database = db.db
-   
+    entries = []
     Date = ''
     desc = ''
     for i in range(len(data)):
@@ -51,7 +55,6 @@ def create_data(url,lang):
 
         bs4_html = BeautifulSoup(d['feed']['summary'], "html.parser")
         date = bs4_html.find('div',{'class':'ReleaseDateSubHeaddateTime'}).text
-        Ministry = bs4_html.find('div',{'class':'MinistryNameSubhead'}).text
         date = date.split()
         Date = f'{date[2]} {date[3]} {date[4]}'
         time = date[5]
@@ -64,22 +67,24 @@ def create_data(url,lang):
             
 
        
-        database.child('News_pib').child(lang).child(data[i]['link'][-7:]).set({'Date':Date,'Time':time,"Ministry":Ministry,'Title':data[i]['title'],'Posted by':pib,'Link':data[i]['link'],"Description":desc})
+        database.child('News').child(lang).child(data[i]['link'][-7:]).set({'Date':Date,'Time':time,'Title':data[i]['title'],'Posted by':pib,'Link':data[i]['link'],"Description":desc})
+        entries.append([Date,time,data[i]['title'],pib,data[i]['link']])
 
-        
+    df = pd.DataFrame(entries,columns=['Date','Time','Title','Posted by','Link'])
+    return  df,Date
 
 
 #__________________________________Craete dataframe file________________________________
 #  
 
-# def create_file(df,date,lang,lang_reg):
+def create_file(df,date,lang,lang_reg):
     
-#     storage = db.storage
-# # as admin
+    storage = db.storage
+# as admin
    
-#     df.to_csv(f'{date}_{lang_reg}_{lang}.csv')
-#     storage.child(f'news_data/{date}_{lang_reg}_{lang}.csv').put(f'{date}_{lang_reg}_{lang}.csv')
-#     os.remove(f'{date}_{lang_reg}_{lang}.csv')
+    df.to_csv(f'{date}_{lang_reg}_{lang}.csv')
+    storage.child(f'news_data/{date}_{lang_reg}_{lang}.csv').put(f'{date}_{lang_reg}_{lang}.csv')
+    os.remove(f'{date}_{lang_reg}_{lang}.csv')
 
 
 
@@ -89,9 +94,9 @@ def fetch_data():
         language = languages[i]
         reg_id = regid[lang_reg[i]]
         url = set_url(language,reg_id)
-        create_data(url,i)
+        df,date = create_df(url,i)
         print(i)
-        # create_file(df,date,i,lang_reg[i])
+        create_file(df,date,i,lang_reg[i])
 
 
 
