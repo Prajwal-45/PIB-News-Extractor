@@ -3,7 +3,7 @@ import pyrebase
 config = {
   "apiKey": "AIzaSyBM8A957jonW-DHp1Gl9h9AFoG6qfOph3E",
   "authDomain": "pib-news-application.firebaseapp.com",
-  "databaseURL": "https://pib-news-application-default-rtdb.firebaseio.com/",
+  "databaseURL": "https://pib-news-application-default-rtdb.firebaseio.com",
   "storageBucket": "pib-news-application.appspot.com"
 }
 

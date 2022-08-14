@@ -3,6 +3,7 @@ import requests
 import feedparser
 from bs4 import BeautifulSoup
 import database as db
+import desc_getter as dg
 import os
 from googletrans import Translator
 import time
@@ -32,26 +33,7 @@ def get_data(url):
     return data['entries']
 
 # _______________________Get data Description____________________________________            
-def get_desc(link,lang):
-    desc = ''
-    
-    link = link
-    res = requests.get(link)
-    d = feedparser.parse(res.text)
 
-    bs4_html = BeautifulSoup(d['feed']['summary'], "html.parser")
-    date = bs4_html.find_all('p')
-    for i in date:
-        i = str(i)
-        bs4_html = BeautifulSoup(i, "html.parser")
-        obtained = bs4_html.find('span')
-        try:
-            
-            desc+= '\n'+obtained.text
-        except:
-           pass
-    desc = translator.translate(desc,dest=abbr[lang]).text
-    return desc
 
 # __________________________________Create dataframe____________________
 def create_df(url,lang):
@@ -79,7 +61,7 @@ def create_df(url,lang):
         pib = f'{date[7]} {date[8]}'
 
         try:
-            desc = get_desc(data[i]['link'],lang)
+            desc = dg.get_desc(data[i]['link'])
         except Exception as e:
             print(e)
             
