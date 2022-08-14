@@ -64,7 +64,7 @@ def create_data(url,lang):
             
 
        
-        database.child('News').child(lang).child(data[i]['link'][-7:]).set({'Date':Date,'Time':time,"Ministry":Ministry,'Title':data[i]['title'],'Posted by':pib,'Link':data[i]['link'],"Description":desc})
+        database.child('News_pib').child(lang).child(data[i]['link'][-7:]).set({'Date':Date,'Time':time,"Ministry":Ministry,'Title':data[i]['title'],'Posted by':pib,'Link':data[i]['link'],"Description":desc})
 
         
 
